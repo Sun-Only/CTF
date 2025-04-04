@@ -1,1 +1,21 @@
+题目链接:https://adworld.xctf.org.cn/challenges/list
+1.前言：分析题目，他说不需要爆破，我们就按照他的注册流程来。
+2.先注册普通用户，发现用普通用户登陆后，会有flag和一张照片，但是，输入并不正确。
+3.换思路，还有一个admin选项，大多数情况下，admin的权限更高，于是创建admin用户，但发现怎么也登录不进去。
+4.我们通过burp抓admin登录时的包，发现有可以污染的地方，这个污染叫js原型链污染，如下：通过添加"__proto_"：{"  "}来进行污染，使得不论输入的是什么用户都会被当作管理员。
+
+{
+  "username":"attacker",
+  "password":"hack",
+  "__proto__": {"isAdmin": true}
+}
+
+tip:
+1.怎么发现是js污染的？用的fuzz里的afl++进行的测试，那么afl++怎么使用？
+  详情使用见语雀笔记。
+2.什么是js污染？
+  大致内容是每个函数都有默认的protocal,这个是和创建的对象直接联系的，而只有“__protol__”:{""}可以对其进行修改，也就是可以对对象进行修改。
+  详情见：https://drun1baby.top/2022/12/29/JavaScript-%E5%8E%9F%E5%9E%8B%E9%93%BE%E6%B1%A1%E6%9F%93/#1-%E4%BB%80%E4%B9%88%E6%98%AF%E5%8E%9F%E5%9E%8B%EF%BC%88JavaScript-%E5%8E%9F%E5%9E%8B%E9%93%BE%E7%BB%A7%E6%89%BF%EF%BC%89
+
+
 
